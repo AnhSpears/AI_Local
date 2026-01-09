@@ -1,0 +1,8 @@
+pytest
+requests
+pyyaml
+scikit-learn
+joblib
+sentence-transformers
+chromadb
+pypdf

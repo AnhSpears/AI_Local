@@ -1,0 +1,15 @@
+# Automation configuration for auto_ingest
+# Edit to adjust behavior and opt-ins
+
+auto_push: true
+auto_create_pr: true
+auto_merge: false
+target_branch: main
+
+# Confidence thresholds
+high: 0.80
+mid: 0.50
+
+backtest_cmd: "python backtest.py"
+watch_path: "documents"
+schedule: "6h"
