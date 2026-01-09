@@ -56,15 +56,37 @@ def _parse_response_json(j):
 
 
 def is_ollama_available(timeout: float = 2.0) -> bool:
-    # Try to query models endpoint if available, otherwise ping generate
+    # Try multiple known endpoints used by Ollama servers to detect availability
     try:
         base = OLLAMA_URL
+        candidates = []
+        # Common derived endpoints
         if base.endswith("/generate"):
-            ping = base.replace("/generate", "/models")
-        else:
-            ping = base
-        r = requests.get(ping, timeout=timeout)
-        return r.status_code == 200
+            candidates.extend([
+                base.replace("/generate", "/v1/models"),
+                base.replace("/generate", "/models"),
+                base.replace("/generate", "/api/models"),
+            ])
+        if base.endswith("/api/generate"):
+            candidates.extend([
+                base.replace("/api/generate", "/v1/models"),
+                base.replace("/api/generate", "/models"),
+            ])
+        # Fallbacks
+        candidates.extend([
+            "http://127.0.0.1:11434/v1/models",
+            "http://127.0.0.1:11434/models",
+            base,
+        ])
+
+        for ping in candidates:
+            try:
+                r = requests.get(ping, timeout=timeout)
+                if r.status_code == 200:
+                    return True
+            except Exception:
+                continue
+        return False
     except Exception:
         return False
 
