@@ -1,0 +1,4 @@
+RAG (Retrieval-Augmented Generation):
+   - Phương pháp kết hợp việc truy xuất thông tin từ cơ sở dữ liệu với khả năng tạo văn bản của mô hình ngôn ngữ.
+   - Trong quá trình xử lý, agent sẽ tìm kiếm thông tin cần thiết từ cơ sở dữ liệu và sử dụng nó để cải thiện chất lượng của câu trả lời.
+   - Tăng cường khả năng hiểu ngữ cảnh và độ chính xác của AI.

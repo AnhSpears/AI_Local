@@ -1,0 +1,46 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Pytest
+.pytest_cache/
+
+# Environment variables
+.env
+.env.*
+
+# Database / data files
+data/
+*.sqlite3
+*.db
+chroma.sqlite3
+
+# Logs and models
+logs/
+models/
+*.log
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+pip-wheel-metadata/
+.env
