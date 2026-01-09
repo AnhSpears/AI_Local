@@ -6,6 +6,7 @@ from pathlib import Path
 
 from core.knowledge_base import KnowledgeBase
 from core.document_rag import DocumentRAG
+from core.classifier import SimpleClassifier
 from pypdf import PdfReader
 
 logging.basicConfig(level=logging.INFO)
@@ -28,8 +29,18 @@ def extract_text(path: Path) -> str:
         return ""
 
 
-def classify_and_copy(source: Path, dest: Path, dry_run: bool = False):
+def classify_and_copy(source: Path, dest: Path, dry_run: bool = False, auto_move: bool = True):
     kb = KnowledgeBase()
+    clf = SimpleClassifier()
+    try:
+        clf.load()
+    except Exception:
+        logging.warning("Classifier model not found; falling back to KnowledgeBase heuristics.")
+        clf = None
+
+    # thresholds (configurable later)
+    high = 0.80
+    mid = 0.50
 
     doc_count = 0
     moved = 0
@@ -43,17 +54,31 @@ def classify_and_copy(source: Path, dest: Path, dry_run: bool = False):
 
             doc_count += 1
             sample = (f + " \n" + extract_text(src)[:2000]).strip()
-            topic = kb.detect_topic(sample)
 
-            target_dir = dest / topic
+            if clf:
+                topic, conf = clf.predict(sample)
+            else:
+                topic = kb.detect_topic(sample)
+                conf = 1.0
+
+            if auto_move:
+                if conf >= high:
+                    target_dir = dest / topic
+                elif conf >= mid:
+                    target_dir = Path("documents/suggested") / topic
+                else:
+                    target_dir = Path("documents/unclassified")
+            else:
+                target_dir = dest / topic
+
             target_dir.mkdir(parents=True, exist_ok=True)
-
             target = target_dir / f
+
             if target.exists():
                 logging.info(f"Bỏ qua (tồn tại): {target}")
                 continue
 
-            logging.info(f"[{topic}] {src} -> {target}")
+            logging.info(f"[{topic} | {conf:.2f}] {src} -> {target}")
             if not dry_run:
                 try:
                     shutil.copy2(src, target)
